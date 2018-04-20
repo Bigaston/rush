@@ -1,0 +1,90 @@
+@font-face {
+    font-family: Monogram;
+    src: url(monogram.ttf);
+}
+
+body
+{
+    background-color: #000000;
+    font-family: Monogram;
+}
+
+iframe {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+section
+{
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 5px;
+    
+}
+
+p
+{
+    font-size: 25px;
+    color: #C2C3C7;
+    text-align: justify;
+    margin-bottom: 3px;
+    overflow: auto;
+    margin-top: 0px;
+}
+
+nav p 
+{
+    font-size: 35px;
+    color: #C2C3C7;
+    text-align: center;
+    margin-bottom: 3px;
+    margin-top: 3px;
+}
+
+a
+{
+    color: #FF004D;
+}
+
+ul
+{
+    font-size: 25px;
+    color: #C2C3C7;
+    text-align: justify;
+    margin-top: 0px;
+}
+
+h2
+{
+    color: #C2C3C7;
+    text-align: center;
+    font-size: 50px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+h3
+{
+    color: #C2C3C7;
+    font-size: 30px;
+    margin-top: 0px;
+    margin-bottom: 0px; 
+}
+
+label
+{
+    font-size: 25px;
+    color: #C2C3C7;
+    text-align: justify;
+    margin-bottom: 3px;
+    overflow: auto;
+    margin-top: 0px;
+}
+
+.centre
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
