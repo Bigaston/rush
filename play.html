@@ -1,22 +1,196 @@
-<html>
+﻿<html>
     <head>
-        <title>Rush ⇒ Play</title>
-        <meta charset="UTF-8">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Rush ⇒ Play<</title>
+        <meta name="description" content="Play level of Rush online">
         <link rel="stylesheet" href="style.css" />
         <link rel="icon" type="image/png" href="./media/favicon.png">
-    </head>
+
+<STYLE TYPE="text/css">
+<!--
+
+canvas#canvas { width: 512px; height: 512px; }
+
+.pico8_el {
+	float:left;
+	width:92px;
+	display:inline-block; 
+  	margin: 1px;
+	padding: 4px;
+	text-align: center;
+	color:#fff;
+	background-color:#777;
+	font-family : verdana;
+	font-size: 9pt;
+	cursor: pointer;
+	cursor: hand;
+}
+.pico8_el a{
+	text-decoration: none;
+	color:#fff;
+}
+
+.pico8_el:hover{
+	background-color:#aaa;
+}
+
+.pico8_el:link{
+	background-color:#aaa;
+}
+
+canvas{
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: optimize-contrast;
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
+    border: 0px
+}
+
+-->
+</STYLE>
     
-    <body>
-	   <br>
-        <nav>
-            <p><a href="./index.html">Index</a> Play levels <a href="./level.html">Community levels</a></p>
-        </nav>
+</head>
+
+<body bgcolor=#303030>
+
+	<br>
+    
+    <nav>
+        <p><a href="./index.html">Index</a> Play levels <a href="./level.html">Community levels</a></p>
+    </nav>
+    
+    <br><br><br>
+
+	<center><div style="width:512px;">
+
+	<canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+
+	<script type="text/javascript">
+		var canvas = document.getElementById("canvas");
+		canvas.width = window.innerWidth;
+		canvas.height = window.innerHeight;
+
+		// show Emscripten environment where the canvas is
+		// arguments are passed to PICO-8
+		
+		var Module = {};
+		Module.canvas = canvas;
+		
+		/*
+			// When pico8_buttons is defined, PICO-8 takes each int to be a live bitfield
+			// representing the state of each player's buttons
+			
+			var pico8_buttons = [0, 0, 0, 0, 0, 0, 0, 0]; // max 8 players
+			pico8_buttons[0] = 2 | 16; // example: player 0, RIGHT and Z held down
+			
+			// when pico8_gpio is defined, reading and writing to gpio pins will
+			// read and write to these values
+			var pico8_gpio = new Array(128);
+		*/
         
-        <br> <br>
+        var pico8_gpio = new Array(128);
         
-        <section>
-            <p class="centre">The web player not work on web for now. Please download the Demo on Itch to play levels. <a href="https://bigaston.itch.io/rush">Click Here</a> </p>
-        </section>
+        function URLGet(param) {
+            var vars = {};
+            window.location.href.replace( location.hash, '' ).replace( 
+            /[?&]+([^=&]+)=?([^&]*)?/gi, // regexp
+            function( m, key, value ) { // callback
+                vars[key] = value !== undefined ? value : '';
+                }
+            );
+
+            if ( param ) {
+                return vars[param] ? vars[param] : null;	
+            }
+            return vars;
+        }
         
-    </body>
-</html>
+        var lvl_code = URLGet("lvl");
+        console.log(lvl_code);
+        var pin = 1;
+        
+        if (lvl_code == null) {
+            pico8_gpio[0] = 4;
+        } else {
+            for (loop=0; loop <= 127; loop = loop+2) {
+                pico8_gpio[pin] = parseInt("0x" + lvl_code[loop] + lvl_code[loop+1]);
+                
+                pin = pin + 1;
+            }
+            pico8_gpio[65] = parseInt(lvl_code[128]);
+            pico8_gpio[66] = parseInt(lvl_code[129]);
+            pico8_gpio[0] = 3;
+        }
+        
+        
+        (function main(){
+            requestAnimationFrame(main); // keep the loop going
+            if (pico8_gpio[0]==1) {
+                var myWindow = window.open("https://twitter.com/intent/user?screen_name=Bigaston", "Bigaston's Twitter", "width=600,height=400");
+                pico8_gpio[0]=0;
+            } else if (pico8_gpio[0]==2) {
+                var myWindow = window.open("https://twitter.com/intent/tweet?text=I%20finish%20this%20level%20of%20Rush%20in%20"  + (pico8_gpio[1]*255 + pico8_gpio[2] + pico8_gpio[3]/100 ) + "%20seconds%20with%20only%20" + (pico8_gpio[4]*255 + pico8_gpio[5]) +  "%20deaths%20!%20What%20about%20you%20%3F%0A%0A%E2%96%B6%20Play%20it%20online%20%3A%20https%3A%2F%2Fwww.bigaston.me%2Frush%2Fplay?lvl=" + lvl_code, "Share your score", "width=600,height=400");
+                pico8_gpio[0]=0;
+            }
+        }()) // call immediately to start the loop
+        
+	</script>
+
+	<script async type="text/javascript" src="rush_play.js"></script>
+	  
+	<script>
+		// key blocker. prevent cursor keys from scrolling page while playing cart.
+		
+		function onKeyDown_blocker(event) {
+			event = event || window.event;
+			var o = document.activeElement;
+			if (!o || o == document.body || o.tagName == "canvas")
+			{
+				if ([32, 37, 38, 39, 40].indexOf(event.keyCode) > -1)
+				{
+					if (event.preventDefault) event.preventDefault();
+				}
+			}
+		}
+
+		document.addEventListener('keydown', onKeyDown_blocker, false);
+
+	</script>
+        
+	<br>
+
+	<div class=pico8_el onclick="Module.pico8Reset();">
+
+	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAaklEQVR4Ae2dOwoAMQhE15A+rfc/3bZ7AlMnQfywCkKsfcgMM9ZP+QHtIn0vLeBAFduiFdQ/0DmvtR5LXJ6CPSXe2ZXcFNlTxFbemKrbZPs35XogeS9xeQr+anT6LzoOwEDwZJ7jwhXUnwkTTiDQ2Ja34AAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII=" alt="Reset" width=12 height=	12/>
+
+	Reset</div>
+
+	<div class=pico8_el onclick="Module.pico8TogglePaused();">
+
+	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAPUlEQVR4Ae3doQ0AIAxEUWABLPtPh2WCq26DwFSU/JPNT166QSu/Hg86W9dwLte+diP7AwAAAAAAgD+A+jM2ZAgo84I0PgAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII=" alt="Pause" width=12 height=12/>
+
+	Pause</div>
+	<div class=pico8_el onclick="Module.requestFullScreen(true, false);">
+	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAaklEQVR4Ae2dsQ1AIQhExfze1v2ns3UCrfgFhmgUUAoGgHscp21wX9BqaZoDojbB96OkDJKNcTN2BHTyYNYmoT2BlPL7BKgcPfHjAVXKKadkHOn9K1r16N0czN6a95N8mnA7Aq2fTZ3Af3UKmCSMazL8HwAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII=" alt="Fullscreen" width=12 height=12/>
+
+	Fullscreen</div>
+	<div class=pico8_el onclick="Module.pico8ToggleSound();">
+	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAXklEQVR4Ae2doQ4AIQxD4YLH8v9fh+ULhjpxxSwLg2uyapr1JRu1iV5Z+1BGl4+xNpX38SYo2uRvYiT5LwEmt+ocgXVLrhPEgBiw8Q5w7/kueSkK+D2tJO4E/I3GrwkqQCBabEj/4QAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII=" alt="Toggle Sound" width=12 height=12/>
+	
+	Sound</div>
+	<div class=pico8_el ><a target="_new" href="http://www.lexaloffle.com/bbs/?cat=7&sub=2">
+	<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAlElEQVR4Ae2dMQ5FQBCGh6jcwAkkateg3DiAa+iQUGqVKi95FQfAJRQOoHeBUf8JyQqKjZ1uMzuz2e/LTE3KhyF7kSlgLOykas23f6D+A9Yp84aAOYU15pcJnfji0Il2ID8HzC4y38ZrnfIBGxeRoR3c3EWrACdsV5BOsx7OSRnrOXh4F5HzA6bevwUn8wlz7eCDsQM99B3ks0s/4QAAABB0RVh0TG9kZVBORwAyMDExMDIyMeNZtsEAAAAASUVORK5CYII=" alt="More Carts" width=12 height=12/>
+
+	Carts</a></div>
+
+	<br>	
+
+	</div></center>
+	<br><br>
+
+</body></html>
+
+
